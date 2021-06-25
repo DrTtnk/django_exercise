@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('login', views.login_page, name='login'),
+
     path('terrain/get_all',         views.get_all_terrains, name='terrains-get-all'),
     path('terrain/get/<int:id>',    views.get_terrain,      name='terrains-get'),
     path('terrain/create/<int:id>', views.create_terrain,   name='terrains-create'),

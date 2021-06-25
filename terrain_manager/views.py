@@ -1,9 +1,20 @@
 import json
 
+from django.core.mail import EmailMessage
 from django.http import JsonResponse, HttpRequest
 from django.shortcuts import redirect
 from .models import Terrain, User, Sensor
 from django.forms.models import model_to_dict
+
+from django.contrib.auth import authenticate, login
+
+
+def login_page(request):
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        login(request, user)
 
 
 def get_all_terrains(request: HttpRequest):
@@ -11,6 +22,7 @@ def get_all_terrains(request: HttpRequest):
 
 
 def get_terrain(request: HttpRequest, id):
+
     return JsonResponse({'terrain': model_to_dict(Terrain.objects.get(id=id))})
 
 
@@ -76,3 +88,14 @@ def update_sensor(request: HttpRequest, id):
 def destroy_sensor(request: HttpRequest, id):
     Sensor.objects.get(id=id).delete()
     return redirect("/get_all")
+
+
+def send_mail_recap():
+    for u in User.objects.all():
+        EmailMessage(
+            'Recap',
+            f'This is a recap for the terrain {u.terrain_set.first().name}',
+            'from@example.com',
+            [u.email],
+            headers={'Message-ID': 'Recap'},
+        ).send(fail_silently=False)
